@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { UserService } from '../user/user.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { CreateUserDto } from '../user/dto/create-user.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +20,7 @@ export class AuthController {
 
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
-    const user = await this.authService.validateUser(
+    const user: User | null = await this.authService.validateUser(
       loginDto.email,
       loginDto.password,
     );
@@ -31,7 +29,7 @@ export class AuthController {
 
   @Post('profile')
   @UseGuards(JwtAuthGuard)
-  getProfile(@Request() req) {
+  getProfile(@Request() req: { user: User }) {
     return req.user;
   }
 }

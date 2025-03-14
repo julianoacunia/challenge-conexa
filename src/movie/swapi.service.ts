@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Injectable } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
-import { HttpService } from '@nestjs/axios'; // Importa HttpService
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class SwapiService {
@@ -14,11 +11,23 @@ export class SwapiService {
   ) {}
 
   async syncMovies(): Promise<void> {
-    const { data } = (await this.httpService
-      .get('https://swapi.dev/api/films/')
-      .toPromise())!;
-    
-    console.log("DATA", data);
+    const response = await this.httpService
+      .get<{
+        results: {
+          title: string;
+          director: string;
+          release_date: string;
+          opening_crawl: string;
+        }[];
+      }>('https://swapi.dev/api/films/')
+      .toPromise();
+
+    if (!response || !response.data) {
+      throw new Error('Failed to fetch films from SWAPI');
+    }
+
+    const data = response.data;
+
     for (const film of data.results) {
       const movieDto: CreateMovieDto = {
         title: film.title,

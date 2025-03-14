@@ -1,8 +1,12 @@
-import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
-import { UserRole } from '../user/dto/create-user.dto'; // Ajusta la ruta según tu estructura
-import { ROLES_KEY } from '../user/roles.decorator'; // Ajusta la ruta según tu estructura
+import { UserRole } from '../user/dto/create-user.dto';
+import { ROLES_KEY } from '../user/roles.decorator';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -11,31 +15,27 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // Llama a la lógica de AuthGuard para verificar el token y adjuntar el usuario
-    const canActivate = await super.canActivate(context); // Usa await aquí
+    const canActivate = await super.canActivate(context);
     if (!canActivate) {
-      return false; // Si el token no es válido, denegar el acceso
+      return false;
     }
 
-    // Obtiene los roles requeridos del decorador @Roles
     const requiredRoles = this.reflector.get<UserRole[]>(
       ROLES_KEY,
       context.getHandler(),
     );
 
     if (!requiredRoles) {
-      return true; // Si no se especifican roles, permitir el acceso
+      return true;
     }
 
-    // Obtiene el usuario adjuntado por Passport
-    const request = context.switchToHttp().getRequest();
+    const request = context
+      .switchToHttp()
+      .getRequest<{ user?: { role?: UserRole } }>();
 
     if (!request.user?.role) {
       throw new UnauthorizedException('Usuario no tiene un rol asignado');
     }
-
-    // Verifica si el rol del usuario está permitido
-    console.log("USER", request.user)
     const hasRole = requiredRoles.includes(request.user.role);
     if (!hasRole) {
       throw new UnauthorizedException(
@@ -46,10 +46,10 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return true;
   }
 
-  handleRequest(err, user, info) {
+  handleRequest<TUser = any>(err: any, user: TUser): TUser {
     if (err || !user) {
       throw err || new UnauthorizedException('No autorizado');
     }
-    return user; // Adjunta el usuario a la solicitud
+    return user as TUser;
   }
 }

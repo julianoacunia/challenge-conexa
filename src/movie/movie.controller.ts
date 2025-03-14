@@ -12,14 +12,12 @@ import { MovieService } from './movie.service';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { UserRole } from "../user/dto/create-user.dto"
-import { Roles } from "../user/roles.decorator";
+import { UserRole } from 'src/user/entities/user.entity';
+import { Roles } from 'src/user/roles.decorator';
 
 @Controller('movies')
 export class MovieController {
-  constructor(
-    private readonly movieService: MovieService,
-  ) {}
+  constructor(private readonly movieService: MovieService) {}
 
   @Get()
   async findAll() {

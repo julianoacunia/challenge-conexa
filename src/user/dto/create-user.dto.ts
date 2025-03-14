@@ -11,5 +11,5 @@ export class CreateUserDto {
 
 export enum UserRole {
   ADMIN = 'admin',
-  REGULAR = 'regular'
+  REGULAR = 'regular',
 }

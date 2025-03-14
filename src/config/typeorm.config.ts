@@ -11,7 +11,7 @@ export const typeOrmConfig = {
     password: configService.get<string>('DATABASE_PASSWORD'),
     database: configService.get<string>('DATABASE_NAME'),
     autoLoadEntities: true,
-    synchronize: true, // Solo en dev, en producción usar migrations
+    synchronize: true,
   }),
   inject: [ConfigService],
 };
