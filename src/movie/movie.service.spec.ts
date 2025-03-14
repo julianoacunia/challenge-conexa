@@ -14,7 +14,13 @@ describe('MovieService', () => {
         MovieService,
         {
           provide: getRepositoryToken(Movie),
-          useClass: Repository,
+          useValue: {
+            create: jest.fn(),
+            save: jest.fn(),
+            find: jest.fn(),
+            findOne: jest.fn(),
+            delete: jest.fn(),
+          },
         },
       ],
     }).compile();
